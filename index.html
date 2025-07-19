@@ -1,0 +1,2351 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entrenamiento Visual para Pilotos - Optimizado</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #0c1445 0%, #1a237e 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .platform-info {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 230, 118, 0.9);
+            color: #0c1445;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .platform-info:hover {
+            background: rgba(0, 230, 118, 1);
+            transform: scale(1.05);
+        }
+
+        .ergonomic-alert {
+            background: linear-gradient(45deg, #ff9800, #f57c00);
+            border: 2px solid #ff6f00;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            text-align: center;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        .break-reminder {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 152, 0, 0.95);
+            border: 3px solid #ff6f00;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            z-index: 10000;
+            max-width: 400px;
+            box-shadow: 0 0 30px rgba(255, 152, 0, 0.5);
+        }
+
+        .break-reminder h3 {
+            color: #fff;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+
+        .break-reminder p {
+            margin: 10px 0;
+            line-height: 1.4;
+        }
+
+        .break-reminder button {
+            background: linear-gradient(45deg, #4caf50, #2e7d32);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 10px 5px;
+            transition: all 0.3s ease;
+        }
+
+        .break-reminder button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #00e676;
+            text-shadow: 0 0 10px rgba(0, 230, 118, 0.5);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.8;
+            max-width: 600px;
+        }
+
+        .platform-stats {
+            background: rgba(0, 230, 118, 0.1);
+            border: 2px solid #00e676;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            text-align: center;
+            max-width: 600px;
+        }
+
+        .platform-stats h3 {
+            color: #00e676;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .platform-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .platform-metric {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #00e676;
+        }
+
+        .platform-metric .value {
+            font-weight: bold;
+            color: #00e676;
+            font-size: 1.1rem;
+        }
+
+        .platform-metric .label {
+            font-size: 0.8rem;
+            opacity: 0.8;
+            margin-top: 2px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .control-group label {
+            font-size: 0.9rem;
+            color: #00e676;
+        }
+
+        input, select, button {
+            padding: 10px 15px;
+            border: 2px solid #00e676;
+            border-radius: 8px;
+            background: rgba(0, 230, 118, 0.1);
+            color: white;
+            font-size: 1rem;
+            min-width: 80px;
+        }
+
+        button {
+            background: linear-gradient(45deg, #00e676, #00c853);
+            color: #0c1445;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 230, 118, 0.4);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .number-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0, 230, 118, 0.1);
+            border: 2px solid #00e676;
+            border-radius: 8px;
+            padding: 5px;
+        }
+
+        .control-btn {
+            width: 35px;
+            height: 35px;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border: 1px solid #00e676;
+            border-radius: 6px;
+            background: linear-gradient(45deg, #00e676, #00c853);
+            color: #0c1445;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: auto;
+        }
+
+        .control-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 3px 10px rgba(0, 230, 118, 0.4);
+        }
+
+        .control-btn:active {
+            transform: scale(0.95);
+        }
+
+        .control-value {
+            min-width: 40px;
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #00e676;
+        }
+
+        .game-container {
+            position: relative;
+            width: 800px;
+            height: 600px;
+            max-width: 90vw;
+            max-height: 60vh;
+            border: 3px solid #00e676;
+            border-radius: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(0, 230, 118, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .game-container:hover {
+            box-shadow: 0 0 40px rgba(0, 230, 118, 0.5);
+        }
+
+        .fullscreen-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 230, 118, 0.8);
+            color: #0c1445;
+            border: none;
+            border-radius: 6px;
+            padding: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            z-index: 50;
+        }
+
+        .fullscreen-btn:hover {
+            background: rgba(0, 230, 118, 1);
+            transform: scale(1.1);
+        }
+
+        .game-container.fullscreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw !important;
+            height: 100vh !important;
+            max-width: 100vw !important;
+            max-height: 100vh !important;
+            border-radius: 0;
+            z-index: 9999;
+            border: none;
+            background: rgba(0, 0, 0, 0.95);
+        }
+
+        .game-container.fullscreen .phase-indicator {
+            font-size: 1.3rem;
+            padding: 15px 20px;
+        }
+
+        .target {
+            position: absolute;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        .target.primary {
+            background: radial-gradient(circle, #ff4444, #cc0000);
+            border: 2px solid #fff;
+            z-index: 10;
+        }
+
+        .target.secondary {
+            background: radial-gradient(circle, #4444ff, #0000cc);
+            border: 2px solid #fff;
+        }
+
+        .target.distractor {
+            background: radial-gradient(circle, #888, #555);
+            border: 1px solid #aaa;
+        }
+
+        .target:hover {
+            transform: scale(1.2);
+        }
+
+        /* Peripheral indicators for mobile */
+        .peripheral-indicator {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: #00e676;
+            border-radius: 50%;
+            opacity: 0.6;
+            pointer-events: none;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 0.2; }
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background: rgba(0, 230, 118, 0.1);
+            border-radius: 10px;
+            border: 1px solid #00e676;
+            min-width: 120px;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #00e676;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+
+        .instructions {
+            max-width: 800px;
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            border: 1px solid #00e676;
+        }
+
+        .instructions h3 {
+            color: #00e676;
+            margin-bottom: 10px;
+        }
+
+        .instructions ul {
+            margin-left: 20px;
+        }
+
+        .instructions li {
+            margin: 5px 0;
+            opacity: 0.9;
+        }
+
+        .phase-indicator {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            padding: 10px 15px;
+            background: rgba(0, 230, 118, 0.9);
+            color: #0c1445;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .countdown {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 4rem;
+            font-weight: bold;
+            color: #00e676;
+            text-shadow: 0 0 20px rgba(0, 230, 118, 0.8);
+            z-index: 100;
+        }
+
+        .session-timer {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 230, 118, 0.9);
+            color: #0c1445;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            z-index: 1000;
+        }
+
+        /* Mobile-specific optimizations */
+        @media (max-width: 414px) {
+            .header h1 {
+                font-size: 1.6rem;
+            }
+            
+            .controls {
+                gap: 8px;
+            }
+            
+            .game-container {
+                width: 95vw;
+                height: 65vh;
+                border-radius: 10px;
+            }
+            
+            .target {
+                transform-origin: center;
+            }
+            
+            .target:hover {
+                transform: scale(1.3);
+            }
+
+            .platform-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
+
+            .controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .control-group {
+                flex-direction: row;
+                justify-content: space-between;
+                width: 100%;
+                max-width: 300px;
+            }
+
+            /* Bottom navigation for thumb access */
+            .mobile-controls {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background: rgba(12, 20, 69, 0.95);
+                padding: 15px;
+                display: flex;
+                justify-content: space-around;
+                border-top: 2px solid #00e676;
+                z-index: 1000;
+            }
+
+            .mobile-controls button {
+                padding: 12px 8px;
+                font-size: 0.9rem;
+                min-width: 70px;
+            }
+        }
+
+        /* Tablet optimizations */
+        @media (min-width: 415px) and (max-width: 768px) {
+            .game-container {
+                width: 85vw;
+                height: 60vh;
+            }
+
+            .platform-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .target:hover {
+                transform: scale(1.25);
+            }
+        }
+
+        /* Desktop optimizations */
+        @media (min-width: 1280px) {
+            .game-container {
+                width: 900px;
+                height: 700px;
+            }
+
+            .platform-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        /* Contrast and accessibility improvements */
+        @media (prefers-contrast: high) {
+            .target.primary {
+                border: 3px solid #fff;
+                box-shadow: 0 0 0 2px #000;
+            }
+            
+            .target.secondary {
+                border: 3px solid #fff;
+                box-shadow: 0 0 0 2px #000;
+            }
+        }
+
+        /* Reduced motion support */
+        @media (prefers-reduced-motion: reduce) {
+            .target {
+                transition: none;
+            }
+            
+            .target:hover {
+                transform: scale(1.1);
+            }
+            
+            .ergonomic-alert {
+                animation: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="platform-info" id="platformInfo">
+        Detectando plataforma...
+    </div>
+
+    <div class="session-timer" id="sessionTimer" style="display: none;">
+        Sesión: 0:00
+    </div>
+
+    <div class="header">
+        <h1>🛩️ Entrenamiento Visual para Pilotos</h1>
+        <p>Optimizado científicamente para tu dispositivo y capacidades visuales</p>
+    </div>
+
+    <div class="platform-stats" id="platformStats">
+        <h3>📊 Configuración Optimizada para tu Dispositivo</h3>
+        <div class="platform-grid" id="platformGrid">
+            <!-- Métricas se llenan dinámicamente -->
+        </div>
+    </div>
+
+    <div class="ergonomic-alert" id="ergonomicAlert" style="display: none;">
+        <!-- Alertas ergonómicas específicas del dispositivo -->
+    </div>
+
+    <div class="controls" id="mainControls">
+        <div class="control-group">
+            <label for="primaryTargets">Objetivos Principales</label>
+            <div class="number-control">
+                <button class="control-btn" id="primaryMinus">-</button>
+                <span class="control-value" id="primaryValue">3</span>
+                <button class="control-btn" id="primaryPlus">+</button>
+            </div>
+        </div>
+        <div class="control-group">
+            <label for="distractors">Distractores</label>
+            <div class="number-control">
+                <button class="control-btn" id="distractorMinus">-</button>
+                <span class="control-value" id="distractorValue">5</span>
+                <button class="control-btn" id="distractorPlus">+</button>
+            </div>
+        </div>
+        <div class="control-group">
+            <label for="speed">Velocidad</label>
+            <select id="speed">
+                <option value="slow">Lento</option>
+                <option value="medium" selected>Medio</option>
+                <option value="fast">Rápido</option>
+                <option value="extreme">Extremo</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label for="duration">Duración (seg)</label>
+            <div class="number-control">
+                <button class="control-btn" id="durationMinus">-</button>
+                <span class="control-value" id="durationValue">30</span>
+                <button class="control-btn" id="durationPlus">+</button>
+            </div>
+        </div>
+        <button id="resetBtn">🔄 Reiniciar</button>
+        <button id="startBtn">🚀 Iniciar Entrenamiento</button>
+        <button id="pauseBtn" disabled>⏸️ Pausar</button>
+    </div>
+
+    <!-- Mobile controls for thumb access -->
+    <div class="mobile-controls" id="mobileControls" style="display: none;">
+        <button id="mobileStartBtn">🚀 Iniciar</button>
+        <button id="mobilePauseBtn" disabled>⏸️ Pausar</button>
+        <button id="mobileResetBtn">🔄 Reset</button>
+        <button id="mobileBreakBtn">💤 Descanso</button>
+    </div>
+
+    <div class="game-container" id="gameContainer">
+        <div class="phase-indicator" id="phaseIndicator">Listo para comenzar</div>
+        <button class="fullscreen-btn" id="fullscreenBtn">⛶</button>
+        <div class="countdown" id="countdown" style="display: none;"></div>
+    </div>
+
+    <div class="stats">
+        <div class="stat-item">
+            <div class="stat-value" id="scoreValue">0</div>
+            <div class="stat-label">Puntuación</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value" id="accuracyValue">0%</div>
+            <div class="stat-label">Precisión</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value" id="missedValue">0</div>
+            <div class="stat-label">Objetivos Perdidos</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value" id="timeValue">0s</div>
+            <div class="stat-label">Tiempo Restante</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value" id="levelValue">1</div>
+            <div class="stat-label">Nivel</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value" id="fieldOfViewValue">N/A</div>
+            <div class="stat-label">Campo Visual</div>
+        </div>
+    </div>
+
+    <div class="instructions">
+        <h3>📋 Entrenamiento Científicamente Optimizado</h3>
+        <ul>
+            <li><strong>Detección automática:</strong> La app se adapta automáticamente a tu dispositivo y capacidades</li>
+            <li><strong>Fase 1 - Memorización:</strong> Se mostrarán los objetivos principales (rojos) por 3 segundos</li>
+            <li><strong>Fase 2 - Seguimiento:</strong> Todos los puntos se vuelven azules y comienzan a moverse</li>
+            <li><strong>Fase 3 - Identificación:</strong> Haz clic en los objetivos que memorizaste inicialmente</li>
+            <li><strong>Adaptación ergonómica:</strong> Sesiones, descansos y tamaños optimizados para tu pantalla</li>
+            <li><strong>Indicadores periféricos:</strong> En móviles, flechas te ayudan a localizar objetivos fuera del centro</li>
+            <li><strong>Progresión inteligente:</strong> Aumenta dificultad respetando límites científicos por dispositivo</li>
+            <li><strong>Recordatorios de salud:</strong> Avisos automáticos para prevenir fatiga visual y problemas posturales</li>
+        </ul>
+    </div>
+
+    <script>
+        class OptimizedPilotTrainingGame {
+            constructor() {
+                this.gameContainer = document.getElementById('gameContainer');
+                this.phase = 'ready';
+                this.targets = [];
+                this.primaryTargets = [];
+                this.peripheralIndicators = [];
+                this.score = 0;
+                this.correctClicks = 0;
+                this.totalClicks = 0;
+                this.missedTargets = 0;
+                this.level = 1;
+                this.timeRemaining = 0;
+                this.gameTimer = null;
+                this.animationFrame = null;
+                this.isPaused = false;
+                this.isFullscreen = false;
+                
+                // Session tracking for ergonomic breaks
+                this.sessionStartTime = Date.now();
+                this.sessionDuration = 0;
+                this.sessionTimer = null;
+                this.breakReminders = [];
+                
+                // Platform detection and optimization
+                this.platform = this.detectPlatform();
+                this.platformConfig = this.getPlatformConfig();
+                this.visualCapabilities = this.calculateVisualCapabilities();
+                
+                // Puntuación del nivel actual
+                this.levelScore = 0;
+                this.levelStartScore = 0;
+                
+                // Configuración inicial optimizada por plataforma
+                this.config = {
+                    primaryTargets: Math.min(3, this.platformConfig.maxTargets),
+                    distractors: Math.min(5, this.platformConfig.maxDistractors),
+                    duration: Math.min(30, this.platformConfig.sessionDuration),
+                    speed: 'medium'
+                };
+                
+                this.speedSettings = {
+                    slow: { min: 0.5, max: 1.5 },
+                    medium: { min: 1, max: 2.5 },
+                    fast: { min: 2, max: 4 },
+                    extreme: { min: 3, max: 6 }
+                };
+                
+                this.init();
+            }
+            
+            init() {
+                this.bindEvents();
+                this.updateStats();
+                this.updateControlValues();
+                this.applyPlatformOptimizations();
+                this.showPlatformInfo();
+                this.startSessionTimer();
+                this.setupBreakReminders();
+                this.updateFieldOfView();
+            }
+            
+            detectPlatform() {
+                // Usar screen.width en lugar de window.innerWidth para detección más precisa
+                const width = Math.max(window.innerWidth, window.screen?.width || window.innerWidth);
+                const height = Math.max(window.innerHeight, window.screen?.height || window.innerHeight);
+                const aspectRatio = width / height;
+                const diagonal = Math.sqrt(width * width + height * height);
+                const pixelDensity = window.devicePixelRatio || 1;
+                
+                console.log(`Detectando plataforma: ${width}x${height}, ratio: ${aspectRatio.toFixed(2)}, diagonal: ${diagonal.toFixed(0)}px, dpi: ${pixelDensity}`);
+                
+                // Detectar si estamos en un iframe pequeño (artifacts)
+                if (width < 300 || height < 200) {
+                    console.log('⚠️ Detectado iframe pequeño, usando configuración tablet por defecto');
+                    return {
+                        type: 'tablet',
+                        category: 'Tablet (Auto)',
+                        visualField: '18×14°',
+                        motCapacity: '4-6 objetos',
+                        ergonomicRisk: 'Medio'
+                    };
+                }
+                
+                // Clasificación científica basada en el estudio
+                if (width <= 414) {
+                    return {
+                        type: 'mobile',
+                        category: 'Smartphone',
+                        visualField: '12×9°',
+                        motCapacity: '2-3 objetos',
+                        ergonomicRisk: 'Alto'
+                    };
+                } else if (width <= 768) {
+                    return {
+                        type: 'tablet',
+                        category: 'Tablet',
+                        visualField: '18×14°', 
+                        motCapacity: '4-6 objetos',
+                        ergonomicRisk: 'Medio'
+                    };
+                } else {
+                    return {
+                        type: 'desktop',
+                        category: 'Escritorio',
+                        visualField: '33×25°',
+                        motCapacity: '5-8 objetos',
+                        ergonomicRisk: 'Bajo'
+                    };
+                }
+            }
+            
+            getPlatformConfig() {
+                const configs = {
+                    mobile: {
+                        // Basado en evidencia científica del estudio
+                        maxTargets: 3, // Limitado por visual crowding
+                        maxDistractors: 4, // Capacidad MOT reducida 30-40%
+                        targetSize: 28, // Touch-friendly 44px mínimo
+                        minSpacing: 45, // Regla Bouma 0.4φ
+                        sessionDuration: 15, // Max 15-20min fatiga visual
+                        restFrequency: 10, // Cada 10min descanso
+                        speedMultiplier: 0.8, // Compensar limitaciones
+                        focusArea: 'center-left', // 80% atención mitad izquierda
+                        peripheralSupport: true, // Indicadores necesarios
+                        ergonomicWarnings: true,
+                        breakReminders: [600000, 1200000], // 10min, 20min
+                        maxSessionTime: 1200000, // 20min máximo
+                        recommendedBreakTime: 300000 // 5min descanso
+                    },
+                    tablet: {
+                        maxTargets: 5, // Capacidad MOT intermedia
+                        maxDistractors: 8, // Más espacio disponible
+                        targetSize: 24, // Estándar optimizado
+                        minSpacing: 35, // Spacing mejorado
+                        sessionDuration: 45, // Hasta 45min tolerados
+                        restFrequency: 20, // Cada 20min
+                        speedMultiplier: 1.0, // Velocidad base
+                        focusArea: 'distributed', // Mejor distribución
+                        peripheralSupport: false,
+                        ergonomicWarnings: false,
+                        breakReminders: [1200000, 2700000], // 20min, 45min
+                        maxSessionTime: 2700000, // 45min máximo
+                        recommendedBreakTime: 300000 // 5min descanso
+                    },
+                    desktop: {
+                        maxTargets: 8, // Capacidad MOT máxima
+                        maxDistractors: 15, // Sin limitaciones espaciales
+                        targetSize: 20, // Tamaño óptimo precisión
+                        minSpacing: 25, // Separación estándar
+                        sessionDuration: 120, // 1-2 horas toleradas
+                        restFrequency: 60, // Regla 20-20-20 adaptada
+                        speedMultiplier: 1.2, // Velocidad completa
+                        focusArea: 'full-field', // Campo visual completo
+                        peripheralSupport: false,
+                        ergonomicWarnings: false,
+                        breakReminders: [3600000, 7200000], // 60min, 120min
+                        maxSessionTime: 7200000, // 2h máximo
+                        recommendedBreakTime: 1200000 // 20min descanso
+                    }
+                };
+                
+                return configs[this.platform.type];
+            }
+            
+            calculateVisualCapabilities() {
+                const width = Math.max(window.innerWidth, 300); // Mínimo 300px
+                const height = Math.max(window.innerHeight, 200); // Mínimo 200px
+                
+                // Cálculo aproximado del campo visual en grados
+                // Asumiendo distancia típica de visualización
+                const viewingDistance = this.platform.type === 'mobile' ? 40 : 
+                                       this.platform.type === 'tablet' ? 50 : 70; // cm
+                
+                // Calcular FOV con valores seguros
+                const horizontalFOV = Math.max(10, 2 * Math.atan((width * 0.026) / (2 * viewingDistance)) * (180 / Math.PI));
+                const verticalFOV = Math.max(8, 2 * Math.atan((height * 0.026) / (2 * viewingDistance)) * (180 / Math.PI));
+                
+                return {
+                    horizontalFOV: horizontalFOV.toFixed(1),
+                    verticalFOV: verticalFOV.toFixed(1),
+                    totalArea: (horizontalFOV * verticalFOV).toFixed(0),
+                    motEfficiency: this.platform.type === 'mobile' ? 0.6 : 
+                                  this.platform.type === 'tablet' ? 0.8 : 1.0,
+                    peripheralCoverage: this.platform.type === 'mobile' ? 0.5 : 
+                                       this.platform.type === 'tablet' ? 0.7 : 0.9
+                };
+            }
+            
+            applyPlatformOptimizations() {
+                // Aplicar configuración inicial basada en plataforma
+                this.config.primaryTargets = Math.min(3, this.platformConfig.maxTargets);
+                this.config.distractors = Math.min(5, this.platformConfig.maxDistractors);
+                this.config.duration = Math.min(30, this.platformConfig.sessionDuration);
+                
+                // Ajustar interfaz según plataforma
+                this.updatePlatformUI();
+                this.updateControlValues();
+                
+                // Configurar CSS variables para tamaños dinámicos
+                document.documentElement.style.setProperty('--target-size', this.platformConfig.targetSize + 'px');
+                document.documentElement.style.setProperty('--min-spacing', this.platformConfig.minSpacing + 'px');
+                
+                // Aplicar optimizaciones específicas de móvil
+                if (this.platform.type === 'mobile') {
+                    this.enableMobileOptimizations();
+                }
+                
+                // Mostrar alertas ergonómicas si es necesario
+                if (this.platformConfig.ergonomicWarnings) {
+                    this.showErgonomicAlert();
+                }
+            }
+            
+            updatePlatformUI() {
+                const gameContainer = document.getElementById('gameContainer');
+                
+                // Aplicar estilos específicos de plataforma
+                if (this.platform.type === 'mobile') {
+                    gameContainer.style.borderRadius = '10px';
+                    // Ajustar tamaños para móvil
+                    document.documentElement.style.setProperty('--mobile-target-size', this.platformConfig.targetSize + 'px');
+                } else if (this.platform.type === 'tablet') {
+                    gameContainer.style.borderRadius = '12px';
+                    document.documentElement.style.setProperty('--tablet-target-size', this.platformConfig.targetSize + 'px');
+                } else {
+                    gameContainer.style.borderRadius = '15px';
+                    document.documentElement.style.setProperty('--desktop-target-size', this.platformConfig.targetSize + 'px');
+                }
+            }
+            
+            enableMobileOptimizations() {
+                // Mostrar controles móviles en la parte inferior
+                document.getElementById('mobileControls').style.display = 'flex';
+                
+                // Ajustar el contenedor del juego para dejar espacio a los controles
+                document.body.style.paddingBottom = '80px';
+                
+                // Activar indicadores periféricos
+                this.peripheralIndicatorsEnabled = true;
+            }
+            
+            showErgonomicAlert() {
+                const alert = document.getElementById('ergonomicAlert');
+                alert.style.display = 'block';
+                
+                const recommendations = {
+                    mobile: [
+                        '📱 Mantén el dispositivo a 40-45cm de tus ojos',
+                        '👁️ Parpadea frecuentemente para evitar sequedad ocular',
+                        '🏃 Toma descansos cada 10 minutos',
+                        '📐 Eleva el dispositivo al nivel de los ojos cuando sea posible'
+                    ],
+                    tablet: [
+                        '📱 Usa un soporte para reducir la flexión del cuello',
+                        '⏰ Sesiones recomendadas de máximo 45 minutos',
+                        '👀 Alterna la posición frecuentemente'
+                    ],
+                    desktop: [
+                        '🖥️ Monitor a 50-70cm de distancia',
+                        '📐 Parte superior del monitor al nivel de los ojos',
+                        '⏰ Regla 20-20-20: cada 20min, mira 20 pies por 20seg'
+                    ]
+                };
+                
+                const recs = recommendations[this.platform.type];
+                alert.innerHTML = `
+                    <h3>⚠️ Recomendaciones Ergonómicas para ${this.platform.category}</h3>
+                    <ul>${recs.map(rec => `<li>${rec}</li>`).join('')}</ul>
+                `;
+            }
+            
+            showPlatformInfo() {
+                const platformInfo = document.getElementById('platformInfo');
+                platformInfo.textContent = `${this.platform.category} - ${this.platform.visualField}`;
+                platformInfo.title = `Capacidad MOT: ${this.platform.motCapacity}, Riesgo ergonómico: ${this.platform.ergonomicRisk}`;
+                
+                const platformStats = document.getElementById('platformGrid');
+                platformStats.innerHTML = `
+                    <div class="platform-metric">
+                        <div class="value">${this.platform.category}</div>
+                        <div class="label">Dispositivo</div>
+                    </div>
+                    <div class="platform-metric">
+                        <div class="value">${this.visualCapabilities.horizontalFOV}°×${this.visualCapabilities.verticalFOV}°</div>
+                        <div class="label">Campo Visual</div>
+                    </div>
+                    <div class="platform-metric">
+                        <div class="value">${this.platformConfig.maxTargets}</div>
+                        <div class="label">Máx. Objetivos</div>
+                    </div>
+                    <div class="platform-metric">
+                        <div class="value">${this.platformConfig.targetSize}px</div>
+                        <div class="label">Tamaño Target</div>
+                    </div>
+                    <div class="platform-metric">
+                        <div class="value">${Math.round(this.visualCapabilities.motEfficiency * 100)}%</div>
+                        <div class="label">Eficiencia MOT</div>
+                    </div>
+                    <div class="platform-metric">
+                        <div class="value">${this.platformConfig.sessionDuration}min</div>
+                        <div class="label">Sesión Máx.</div>
+                    </div>
+                `;
+                
+                console.log('🎯 Configuración de plataforma aplicada:', {
+                    platform: this.platform,
+                    config: this.platformConfig,
+                    visual: this.visualCapabilities
+                });
+            }
+            
+            startSessionTimer() {
+                this.sessionTimer = setInterval(() => {
+                    this.sessionDuration = Date.now() - this.sessionStartTime;
+                    const minutes = Math.floor(this.sessionDuration / 60000);
+                    const seconds = Math.floor((this.sessionDuration % 60000) / 1000);
+                    
+                    document.getElementById('sessionTimer').textContent = 
+                        `Sesión: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+                    document.getElementById('sessionTimer').style.display = 'block';
+                }, 1000);
+            }
+            
+            setupBreakReminders() {
+                this.platformConfig.breakReminders.forEach((time, index) => {
+                    setTimeout(() => {
+                        if (this.sessionDuration >= time) {
+                            this.showBreakReminder(index + 1);
+                        }
+                    }, time);
+                });
+                
+                // Recordatorio de sesión máxima
+                setTimeout(() => {
+                    this.showMaxSessionWarning();
+                }, this.platformConfig.maxSessionTime);
+            }
+            
+            showBreakReminder(reminderNumber) {
+                if (this.phase === 'ready' || this.phase === 'finished') return;
+                
+                const breakDialog = document.createElement('div');
+                breakDialog.className = 'break-reminder';
+                breakDialog.innerHTML = `
+                    <h3>⏰ Tiempo de Descanso Visual</h3>
+                    <p>Has estado entrenando por ${Math.floor(this.sessionDuration / 60000)} minutos.</p>
+                    <p><strong>Recomendación ${this.platform.category}:</strong></p>
+                    <p>${this.getBreakRecommendation()}</p>
+                    <button onclick="this.parentElement.remove()">Continuar (5min más)</button>
+                    <button onclick="this.parentElement.remove(); game.takeBreak()">Tomar Descanso</button>
+                `;
+                
+                document.body.appendChild(breakDialog);
+                
+                // Auto-remove after 10 seconds if no action
+                setTimeout(() => {
+                    if (breakDialog.parentElement) {
+                        breakDialog.remove();
+                    }
+                }, 10000);
+            }
+            
+            getBreakRecommendation() {
+                const recs = {
+                    mobile: 'Mira a lo lejos (6+ metros) por 2-3 minutos. Estira el cuello y parpadea varias veces.',
+                    tablet: 'Regla 20-20-20: mira algo a 20 pies (6m) por 20 segundos. Ajusta tu postura.',
+                    desktop: 'Levántate, camina 2-3 minutos. Mira por la ventana o a lo lejos. Hidratate.'
+                };
+                return recs[this.platform.type];
+            }
+            
+            takeBreak() {
+                this.pauseGame();
+                const breakTime = this.platformConfig.recommendedBreakTime;
+                const breakMinutes = Math.floor(breakTime / 60000);
+                
+                const breakTimer = document.createElement('div');
+                breakTimer.className = 'break-reminder';
+                breakTimer.innerHTML = `
+                    <h3>💤 Descanso Activo - ${breakMinutes} minutos</h3>
+                    <p id="breakCountdown">Tiempo restante: ${breakMinutes}:00</p>
+                    <p>Sigue las recomendaciones ergonómicas mientras descansas.</p>
+                    <button onclick="this.parentElement.remove(); game.resumeGame()">Terminar Descanso</button>
+                `;
+                
+                document.body.appendChild(breakTimer);
+                
+                let timeLeft = breakTime;
+                const countdown = setInterval(() => {
+                    timeLeft -= 1000;
+                    const mins = Math.floor(timeLeft / 60000);
+                    const secs = Math.floor((timeLeft % 60000) / 1000);
+                    document.getElementById('breakCountdown').textContent = 
+                        `Tiempo restante: ${mins}:${secs.toString().padStart(2, '0')}`;
+                    
+                    if (timeLeft <= 0) {
+                        clearInterval(countdown);
+                        breakTimer.remove();
+                        this.resumeGame();
+                    }
+                }, 1000);
+            }
+            
+            updateFieldOfView() {
+                document.getElementById('fieldOfViewValue').textContent = 
+                    `${this.visualCapabilities.horizontalFOV}°×${this.visualCapabilities.verticalFOV}°`;
+            }
+            
+            bindEvents() {
+                document.getElementById('startBtn').addEventListener('click', () => this.startGame());
+                document.getElementById('pauseBtn').addEventListener('click', () => this.togglePause());
+                document.getElementById('resetBtn').addEventListener('click', () => this.resetGame());
+                
+                // Mobile controls
+                document.getElementById('mobileStartBtn').addEventListener('click', () => this.startGame());
+                document.getElementById('mobilePauseBtn').addEventListener('click', () => this.togglePause());
+                document.getElementById('mobileResetBtn').addEventListener('click', () => this.resetGame());
+                document.getElementById('mobileBreakBtn').addEventListener('click', () => this.takeBreak());
+                
+                // Controles de número con validación por plataforma
+                document.getElementById('primaryPlus').addEventListener('click', () => 
+                    this.adjustValue('primaryTargets', 1, 1, this.platformConfig.maxTargets));
+                document.getElementById('primaryMinus').addEventListener('click', () => 
+                    this.adjustValue('primaryTargets', -1, 1, this.platformConfig.maxTargets));
+                document.getElementById('distractorPlus').addEventListener('click', () => 
+                    this.adjustValue('distractors', 1, 2, this.platformConfig.maxDistractors));
+                document.getElementById('distractorMinus').addEventListener('click', () => 
+                    this.adjustValue('distractors', -1, 2, this.platformConfig.maxDistractors));
+                document.getElementById('durationPlus').addEventListener('click', () => 
+                    this.adjustValue('duration', 5, 10, this.platformConfig.sessionDuration));
+                document.getElementById('durationMinus').addEventListener('click', () => 
+                    this.adjustValue('duration', -5, 10, this.platformConfig.sessionDuration));
+                
+                document.getElementById('speed').addEventListener('change', (e) => {
+                    this.config.speed = e.target.value;
+                });
+                
+                document.getElementById('fullscreenBtn').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.toggleFullscreen();
+                });
+                
+                // Touch/click handlers with platform optimization
+                this.gameContainer.addEventListener('click', (e) => {
+                    if ((e.target === this.gameContainer || e.target.id === 'phaseIndicator') && 
+                        (this.phase === 'ready' || this.phase === 'finished')) {
+                        if (this.platform.type !== 'mobile') {
+                            this.toggleFullscreen();
+                        }
+                    }
+                });
+                
+                // Keyboard shortcuts
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape' && this.isFullscreen) {
+                        this.toggleFullscreen();
+                    }
+                    if (e.key === ' ' && this.phase === 'tracking') {
+                        e.preventDefault();
+                        this.togglePause();
+                    }
+                });
+                
+                document.addEventListener('fullscreenchange', () => {
+                    if (!document.fullscreenElement && this.isFullscreen) {
+                        this.isFullscreen = false;
+                        this.gameContainer.classList.remove('fullscreen');
+                        document.getElementById('fullscreenBtn').textContent = '⛶';
+                        document.body.style.overflow = 'auto';
+                    }
+                });
+                
+                // Resize handler for dynamic optimization
+                window.addEventListener('resize', () => {
+                    this.recalculateOptimizations();
+                });
+            }
+            
+            recalculateOptimizations() {
+                const newPlatform = this.detectPlatform();
+                if (newPlatform.type !== this.platform.type) {
+                    this.platform = newPlatform;
+                    this.platformConfig = this.getPlatformConfig();
+                    this.visualCapabilities = this.calculateVisualCapabilities();
+                    this.applyPlatformOptimizations();
+                    this.showPlatformInfo();
+                    this.updateFieldOfView();
+                    console.log('🔄 Plataforma recalculada por cambio de tamaño:', this.platform);
+                }
+            }
+            
+            adjustValue(setting, change, min, max) {
+                const newValue = this.config[setting] + change;
+                const clampedValue = Math.max(min, Math.min(max, newValue));
+                
+                // Mostrar advertencia si se alcanza el límite de la plataforma
+                if (newValue > max && change > 0) {
+                    this.showLimitWarning(setting, max);
+                }
+                
+                this.config[setting] = clampedValue;
+                this.updateControlValues();
+            }
+            
+            showLimitWarning(setting, limit) {
+                const warnings = {
+                    primaryTargets: `Límite alcanzado: ${limit} objetivos principales para ${this.platform.category}`,
+                    distractors: `Límite alcanzado: ${limit} distractores para ${this.platform.category}`,
+                    duration: `Límite alcanzado: ${limit} segundos para ${this.platform.category}`
+                };
+                
+                const warning = document.createElement('div');
+                warning.style.cssText = `
+                    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+                    background: rgba(255, 152, 0, 0.95); color: white; padding: 15px;
+                    border-radius: 8px; font-weight: bold; z-index: 10001;
+                    text-align: center; max-width: 300px;
+                `;
+                warning.textContent = warnings[setting];
+                document.body.appendChild(warning);
+                
+                setTimeout(() => warning.remove(), 3000);
+            }
+            
+            createTarget(type, maxWidth, maxHeight) {
+                const target = document.createElement('div');
+                target.className = `target ${type}`;
+                
+                // Tamaño adaptativo basado en plataforma
+                const size = this.platformConfig.targetSize;
+                target.style.width = size + 'px';
+                target.style.height = size + 'px';
+                
+                // Posición con spacing mínimo respetado
+                let x, y, attempts = 0;
+                do {
+                    x = Math.max(10, Math.min(maxWidth - size - 10, Math.random() * (maxWidth - size)));
+                    y = Math.max(10, Math.min(maxHeight - size - 10, Math.random() * (maxHeight - size)));
+                    attempts++;
+                } while (attempts < 50 && !this.isValidPosition(x, y, size));
+                
+                target.style.left = x + 'px';
+                target.style.top = y + 'px';
+                
+                // Velocidad ajustada por plataforma
+                const speedRange = this.speedSettings[this.config.speed];
+                const baseSpeed = speedRange.min + Math.random() * (speedRange.max - speedRange.min);
+                const adjustedSpeed = baseSpeed * this.platformConfig.speedMultiplier;
+                const angle = Math.random() * 2 * Math.PI;
+                
+                target.velocity = {
+                    x: Math.cos(angle) * adjustedSpeed,
+                    y: Math.sin(angle) * adjustedSpeed
+                };
+                
+                target.isPrimary = type === 'primary';
+                target.clicked = false;
+                target.id = `target_${Date.now()}_${Math.random()}`;
+                
+                target.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.onTargetClick(target);
+                });
+                
+                // Efecto hover optimizado por plataforma
+                if (this.platform.type === 'mobile') {
+                    target.addEventListener('touchstart', () => {
+                        target.style.transform = 'scale(1.3)';
+                    });
+                    target.addEventListener('touchend', () => {
+                        target.style.transform = 'scale(1)';
+                    });
+                }
+                
+                this.gameContainer.appendChild(target);
+                return target;
+            }
+            
+            isValidPosition(x, y, size) {
+                const minSpacing = this.platformConfig.minSpacing;
+                
+                return this.targets.every(existingTarget => {
+                    const existingX = parseFloat(existingTarget.style.left);
+                    const existingY = parseFloat(existingTarget.style.top);
+                    const distance = Math.sqrt(
+                        Math.pow(x - existingX, 2) + Math.pow(y - existingY, 2)
+                    );
+                    return distance >= minSpacing;
+                });
+            }
+            
+            createPeripheralIndicators() {
+                if (!this.platformConfig.peripheralSupport) return;
+                
+                this.clearPeripheralIndicators();
+                
+                this.primaryTargets.forEach(target => {
+                    const indicator = document.createElement('div');
+                    indicator.className = 'peripheral-indicator';
+                    
+                    // Posicionar en el borde de la pantalla apuntando al target
+                    const targetRect = target.getBoundingClientRect();
+                    const containerRect = this.gameContainer.getBoundingClientRect();
+                    
+                    const centerX = containerRect.width / 2;
+                    const centerY = containerRect.height / 2;
+                    const targetX = targetRect.left - containerRect.left + targetRect.width / 2;
+                    const targetY = targetRect.top - containerRect.top + targetRect.height / 2;
+                    
+                    const angle = Math.atan2(targetY - centerY, targetX - centerX);
+                    const borderX = centerX + Math.cos(angle) * (containerRect.width * 0.4);
+                    const borderY = centerY + Math.sin(angle) * (containerRect.height * 0.4);
+                    
+                    indicator.style.left = borderX + 'px';
+                    indicator.style.top = borderY + 'px';
+                    
+                    this.gameContainer.appendChild(indicator);
+                    this.peripheralIndicators.push(indicator);
+                });
+            }
+            
+            clearPeripheralIndicators() {
+                this.peripheralIndicators.forEach(indicator => {
+                    if (indicator.parentNode) {
+                        indicator.parentNode.removeChild(indicator);
+                    }
+                });
+                this.peripheralIndicators = [];
+            }
+            
+            startGame() {
+                if (this.phase === 'ready' || this.phase === 'finished') {
+                    this.levelStartScore = this.score;
+                    this.levelScore = 0;
+                    this.initializeGame();
+                    this.startMemorizationPhase();
+                }
+            }
+            
+            initializeGame() {
+                const primaryCount = this.config.primaryTargets;
+                const distractorCount = this.config.distractors;
+                this.timeRemaining = this.config.duration;
+                
+                this.clearTargets();
+                this.createTargets(primaryCount, distractorCount);
+                this.updateButtons(false, true, true);
+                this.updateStats();
+            }
+            
+            createTargets(primaryCount, distractorCount) {
+                const containerRect = this.gameContainer.getBoundingClientRect();
+                const containerWidth = containerRect.width - 40;
+                const containerHeight = containerRect.height - 40;
+                
+                // Crear objetivos principales
+                for (let i = 0; i < primaryCount; i++) {
+                    const target = this.createTarget('primary', containerWidth, containerHeight);
+                    this.targets.push(target);
+                    this.primaryTargets.push(target);
+                }
+                
+                // Crear distractores
+                for (let i = 0; i < distractorCount; i++) {
+                    const target = this.createTarget('distractor', containerWidth, containerHeight);
+                    this.targets.push(target);
+                }
+            }
+            
+            startMemorizationPhase() {
+                this.phase = 'memorization';
+                this.updatePhaseIndicator('Memoriza los objetivos ROJOS');
+                
+                // Crear indicadores periféricos para móviles
+                if (this.platformConfig.peripheralSupport) {
+                    setTimeout(() => {
+                        this.createPeripheralIndicators();
+                    }, 500);
+                }
+                
+                this.showCountdown(3, () => {
+                    this.startTrackingPhase();
+                });
+            }
+            
+            showCountdown(seconds, callback) {
+                const countdown = document.getElementById('countdown');
+                countdown.style.display = 'block';
+                countdown.textContent = seconds;
+                
+                if (seconds > 0) {
+                    setTimeout(() => {
+                        this.showCountdown(seconds - 1, callback);
+                    }, 1000);
+                } else {
+                    countdown.style.display = 'none';
+                    callback();
+                }
+            }
+            
+            startTrackingPhase() {
+                this.phase = 'tracking';
+                this.updatePhaseIndicator('Sigue los objetivos con tu vista');
+                
+                // Cambiar todos los objetivos a azul
+                this.targets.forEach(target => {
+                    target.className = 'target secondary';
+                });
+                
+                // Limpiar indicadores periféricos durante tracking
+                this.clearPeripheralIndicators();
+                
+                this.startAnimation();
+                
+                this.gameTimer = setInterval(() => {
+                    this.timeRemaining--;
+                    this.updateStats();
+                    
+                    if (this.timeRemaining <= 0) {
+                        this.startIdentificationPhase();
+                    }
+                }, 1000);
+            }
+            
+            startAnimation() {
+                const animate = () => {
+                    if (this.phase === 'tracking' && !this.isPaused) {
+                        this.updateTargetPositions();
+                    }
+                    
+                    if (this.phase === 'tracking' || this.phase === 'identification') {
+                        this.animationFrame = requestAnimationFrame(animate);
+                    }
+                };
+                
+                animate();
+            }
+            
+            updateTargetPositions() {
+                const containerRect = this.gameContainer.getBoundingClientRect();
+                const containerWidth = containerRect.width - 20;
+                const containerHeight = containerRect.height - 20;
+                
+                this.targets.forEach(target => {
+                    if (!target.velocity) return;
+                    
+                    const currentX = parseFloat(target.style.left);
+                    const currentY = parseFloat(target.style.top);
+                    
+                    let newX = currentX + target.velocity.x;
+                    let newY = currentY + target.velocity.y;
+                    
+                    // Rebote en los bordes
+                    if (newX <= 0 || newX >= containerWidth) {
+                        target.velocity.x = -target.velocity.x;
+                        newX = Math.max(0, Math.min(containerWidth, newX));
+                    }
+                    
+                    if (newY <= 0 || newY >= containerHeight) {
+                        target.velocity.y = -target.velocity.y;
+                        newY = Math.max(0, Math.min(containerHeight, newY));
+                    }
+                    
+                    target.style.left = newX + 'px';
+                    target.style.top = newY + 'px';
+                });
+            }
+            
+            startIdentificationPhase() {
+                this.phase = 'identification';
+                this.updatePhaseIndicator('¡Haz clic en los objetivos que memorizaste!');
+                
+                clearInterval(this.gameTimer);
+                cancelAnimationFrame(this.animationFrame);
+                
+                // Detener movimiento
+                this.targets.forEach(target => {
+                    target.velocity = { x: 0, y: 0 };
+                });
+                
+                // Crear indicadores periféricos para ayudar en la identificación (solo móvil)
+                if (this.platformConfig.peripheralSupport) {
+                    setTimeout(() => {
+                        this.createPeripheralIndicators();
+                    }, 1000);
+                }
+                
+                this.identificationTimer = setTimeout(() => {
+                    if (this.phase === 'identification') {
+                        this.updatePhaseIndicator('¡Tiempo agotado! Calculando resultados...');
+                        setTimeout(() => {
+                            this.finishGame();
+                        }, 1500);
+                    }
+                }, 10000);
+            }
+            
+            onTargetClick(target) {
+                if (this.phase !== 'identification' || target.clicked) return;
+                
+                target.clicked = true;
+                this.totalClicks++;
+                
+                const difficultyMultiplier = this.calculateDifficultyMultiplier();
+                
+                if (target.isPrimary) {
+                    this.correctClicks++;
+                    const basePoints = 10;
+                    const earnedPoints = Math.round(basePoints * difficultyMultiplier);
+                    this.score += earnedPoints;
+                    this.levelScore += earnedPoints;
+                    target.style.background = 'radial-gradient(circle, #00ff00, #008800)';
+                    
+                    this.showPointsAnimation(target, `+${earnedPoints}`, '#00ff00');
+                } else {
+                    const basePenalty = 5;
+                    const penalty = Math.round(basePenalty * difficultyMultiplier);
+                    this.score -= penalty;
+                    this.levelScore -= penalty;
+                    target.style.background = 'radial-gradient(circle, #ff0000, #880000)';
+                    
+                    this.showPointsAnimation(target, `-${penalty}`, '#ff0000');
+                }
+                
+                this.updateStats();
+                
+                const identifiedPrimary = this.primaryTargets.filter(t => t.clicked).length;
+                if (identifiedPrimary === this.primaryTargets.length) {
+                    this.updatePhaseIndicator('¡Todos los objetivos identificados! Calculando resultados...');
+                    setTimeout(() => {
+                        this.finishGame();
+                    }, 2000);
+                }
+            }
+            
+            calculateDifficultyMultiplier() {
+                const primaryCount = this.config.primaryTargets;
+                const distractorCount = this.config.distractors;
+                const duration = this.config.duration;
+                const speed = this.config.speed;
+                
+                let multiplier = 1.0;
+                
+                // Factores de dificultad científicamente ajustados
+                multiplier += (primaryCount - 3) * 0.3;
+                multiplier += (distractorCount - 5) * 0.15;
+                
+                if (duration < 30) {
+                    multiplier += (30 - duration) * 0.02;
+                }
+                
+                const speedMultipliers = {
+                    'slow': 0.7,
+                    'medium': 1.0,
+                    'fast': 1.4,
+                    'extreme': 1.8
+                };
+                multiplier *= speedMultipliers[speed];
+                
+                // Multiplicador por nivel
+                multiplier += (this.level - 1) * 0.1;
+                
+                // Multiplicador por plataforma (compensar limitaciones)
+                const platformMultipliers = {
+                    mobile: 1.3, // Compensar dificultad extra
+                    tablet: 1.1,
+                    desktop: 1.0
+                };
+                multiplier *= platformMultipliers[this.platform.type];
+                
+                return Math.max(0.5, Math.min(5.0, multiplier));
+            }
+            
+            showPointsAnimation(target, text, color) {
+                const pointsEl = document.createElement('div');
+                pointsEl.textContent = text;
+                pointsEl.style.position = 'absolute';
+                pointsEl.style.left = target.style.left;
+                pointsEl.style.top = target.style.top;
+                pointsEl.style.color = color;
+                pointsEl.style.fontWeight = 'bold';
+                pointsEl.style.fontSize = '1.2rem';
+                pointsEl.style.textShadow = '0 0 5px rgba(0,0,0,0.8)';
+                pointsEl.style.pointerEvents = 'none';
+                pointsEl.style.zIndex = '1000';
+                pointsEl.style.transition = 'all 1s ease-out';
+                
+                this.gameContainer.appendChild(pointsEl);
+                
+                setTimeout(() => {
+                    pointsEl.style.transform = 'translateY(-30px)';
+                    pointsEl.style.opacity = '0';
+                }, 50);
+                
+                setTimeout(() => {
+                    if (pointsEl.parentNode) {
+                        pointsEl.parentNode.removeChild(pointsEl);
+                    }
+                }, 1100);
+            }
+            
+            finishGame() {
+                this.phase = 'finished';
+                clearInterval(this.gameTimer);
+                clearTimeout(this.identificationTimer);
+                cancelAnimationFrame(this.animationFrame);
+                
+                this.highlightAllTargets();
+                this.clearPeripheralIndicators();
+                
+                this.missedTargets = this.primaryTargets.filter(t => !t.clicked).length;
+                
+                const difficultyMultiplier = this.calculateDifficultyMultiplier();
+                let levelBonusPoints = 0;
+                
+                // Bonus por precisión perfecta
+                if (this.missedTargets === 0 && this.correctClicks === this.primaryTargets.length && this.totalClicks === this.primaryTargets.length) {
+                    const perfectBonus = Math.round(50 * difficultyMultiplier);
+                    this.score += perfectBonus;
+                    this.levelScore += perfectBonus;
+                    levelBonusPoints += perfectBonus;
+                    this.showBonusMessage(`¡PRECISIÓN PERFECTA! +${perfectBonus} puntos`);
+                }
+                
+                // Bonus por completar rápido
+                if (this.timeRemaining > 0) {
+                    const timeBonus = Math.round(this.timeRemaining * 2 * difficultyMultiplier);
+                    this.score += timeBonus;
+                    this.levelScore += timeBonus;
+                    levelBonusPoints += timeBonus;
+                    this.showBonusMessage(`¡BONUS TIEMPO! +${timeBonus} puntos`);
+                }
+                
+                // Bonus por adaptación a plataforma
+                if (this.platform.type === 'mobile' && this.correctClicks >= 2) {
+                    const mobileBonus = Math.round(25 * difficultyMultiplier);
+                    this.score += mobileBonus;
+                    this.levelScore += mobileBonus;
+                    levelBonusPoints += mobileBonus;
+                    this.showBonusMessage(`¡BONUS MÓVIL! +${mobileBonus} puntos`);
+                }
+                
+                this.finalLevelScore = this.levelScore;
+                
+                const levelPassed = this.missedTargets <= 1;
+                const accuracy = this.totalClicks > 0 ? (this.correctClicks / this.totalClicks) * 100 : 0;
+                
+                let message = `¡Nivel ${this.level} completado en ${this.platform.category}!\n`;
+                message += `Puntuación del nivel: ${this.finalLevelScore}\n`;
+                message += `Puntuación total: ${this.score}\n`;
+                message += `Precisión: ${Math.round(accuracy)}%\n`;
+                message += `Eficiencia MOT: ${Math.round(this.visualCapabilities.motEfficiency * 100)}%`;
+                
+                this.updatePhaseIndicator(message.replace(/\n/g, ' '));
+                
+                setTimeout(() => {
+                    this.showGameOverDialog(levelPassed, message);
+                }, 3000);
+                
+                this.updateButtons(true, false, true);
+                this.updateStats();
+            }
+            
+            highlightAllTargets() {
+                this.targets.forEach(target => {
+                    if (target.isPrimary) {
+                        if (target.clicked) {
+                            target.style.background = 'radial-gradient(circle, #00ff00, #008800)';
+                            target.style.border = '3px solid #00ff00';
+                        } else {
+                            target.style.background = 'radial-gradient(circle, #ffff00, #cccc00)';
+                            target.style.border = '3px solid #ffff00';
+                            this.showPointsAnimation(target, 'PERDIDO', '#ffff00');
+                        }
+                    } else {
+                        if (target.clicked) {
+                            target.style.background = 'radial-gradient(circle, #ff0000, #880000)';
+                            target.style.border = '3px solid #ff0000';
+                        } else {
+                            target.style.background = 'radial-gradient(circle, #cccccc, #999999)';
+                            target.style.border = '2px solid #aaa';
+                        }
+                    }
+                });
+            }
+            
+            showBonusMessage(text) {
+                const bonusEl = document.createElement('div');
+                bonusEl.textContent = text;
+                bonusEl.style.position = 'absolute';
+                bonusEl.style.top = '50%';
+                bonusEl.style.left = '50%';
+                bonusEl.style.transform = 'translate(-50%, -50%)';
+                bonusEl.style.color = '#FFD700';
+                bonusEl.style.fontSize = '1.5rem';
+                bonusEl.style.fontWeight = 'bold';
+                bonusEl.style.textShadow = '0 0 10px rgba(255, 215, 0, 0.8)';
+                bonusEl.style.pointerEvents = 'none';
+                bonusEl.style.zIndex = '1001';
+                bonusEl.style.transition = 'all 2s ease-out';
+                bonusEl.style.textAlign = 'center';
+                
+                this.gameContainer.appendChild(bonusEl);
+                
+                setTimeout(() => {
+                    bonusEl.style.transform = 'translate(-50%, -70%)';
+                    bonusEl.style.opacity = '0';
+                }, 100);
+                
+                setTimeout(() => {
+                    if (bonusEl.parentNode) {
+                        bonusEl.parentNode.removeChild(bonusEl);
+                    }
+                }, 2200);
+            }
+            
+            showGameOverDialog(levelPassed, message) {
+                const accuracy = this.totalClicks > 0 ? (this.correctClicks / this.totalClicks) * 100 : 0;
+                const multiplier = this.calculateDifficultyMultiplier();
+                
+                const dialog = document.createElement('div');
+                dialog.className = 'game-over-dialog';
+                dialog.innerHTML = `
+                    <div class="dialog-content">
+                        <h2>${levelPassed ? '🎉 ¡Nivel Completado!' : '💪 Nivel Terminado'}</h2>
+                        
+                        <div class="dialog-section">
+                            <h3>📱 Configuración ${this.platform.category}</h3>
+                            <div class="platform-summary">
+                                <div>📊 Campo visual: <strong>${this.platform.visualField}</strong></div>
+                                <div>🎯 Capacidad MOT: <strong>${this.platform.motCapacity}</strong></div>
+                                <div>⚡ Eficiencia: <strong>${Math.round(this.visualCapabilities.motEfficiency * 100)}%</strong></div>
+                                <div>🎮 Configuración: <strong>${this.config.primaryTargets} objetivos, ${this.config.distractors} distractores</strong></div>
+                            </div>
+                        </div>
+                        
+                        <div class="dialog-section">
+                            <h3>📊 Puntuación Optimizada</h3>
+                            <div class="level-score-highlight">
+                                <div class="score-breakdown">
+                                    <div class="score-before">Puntuación anterior: <strong>${this.levelStartScore}</strong></div>
+                                    <div class="score-earned">Puntos ganados: <strong>+${this.finalLevelScore}</strong></div>
+                                    <div class="score-total">Puntuación total: <strong>${this.score}</strong></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="dialog-section">
+                            <h3>📋 Resultados del Nivel</h3>
+                            <div class="results-grid">
+                                <div>✅ Objetivos acertados: <strong>${this.correctClicks}/${this.config.primaryTargets}</strong></div>
+                                <div>❌ Objetivos perdidos: <strong>${this.missedTargets}</strong></div>
+                                <div>🎯 Precisión: <strong>${Math.round(accuracy)}%</strong></div>
+                                <div>⏰ Tiempo restante: <strong>${this.timeRemaining}s</strong></div>
+                            </div>
+                        </div>
+                        
+                        <div class="dialog-section">
+                            <h3>⚡ Multiplicador ${this.platform.category}: ${multiplier.toFixed(1)}x</h3>
+                            <div class="multiplier-breakdown">
+                                <small>
+                                    • Plataforma ${this.platform.category}: ${this.getPlatformMultiplierDisplay()}<br>
+                                    • Objetivos (${this.config.primaryTargets}): +${((this.config.primaryTargets - 3) * 0.3 * 100).toFixed(0)}%<br>
+                                    • Distractores (${this.config.distractors}): +${((this.config.distractors - 5) * 0.15 * 100).toFixed(0)}%<br>
+                                    • Velocidad ${this.getSpeedName(this.config.speed)}: ${this.getSpeedMultiplierDisplay(this.config.speed)}<br>
+                                    • Nivel ${this.level}: +${((this.level - 1) * 0.1 * 100).toFixed(0)}%
+                                </small>
+                            </div>
+                        </div>
+                        
+                        <div class="dialog-buttons">
+                            ${this.level > 1 ? `<button class="dialog-btn level-down-btn">⬇️ Nivel Anterior (${this.level - 1})</button>` : ''}
+                            ${levelPassed ? `<button class="dialog-btn next-btn">🚀 Siguiente Nivel (${this.level + 1})</button>` : ''}
+                            <button class="dialog-btn retry-btn">🔄 Reintentar Nivel ${this.level}</button>
+                            <button class="dialog-btn menu-btn">🏠 Menú Principal</button>
+                        </div>
+                        
+                        <div class="next-level-info">
+                            ${levelPassed ? this.getNextLevelInfo() : this.getRetryInfo()}
+                        </div>
+                        
+                        ${this.getErgonomicRecommendation()}
+                    </div>
+                `;
+                
+                this.addDialogStyles();
+                document.body.appendChild(dialog);
+                
+                // Event listeners para los botones
+                const nextBtn = dialog.querySelector('.next-btn');
+                const retryBtn = dialog.querySelector('.retry-btn');
+                const levelDownBtn = dialog.querySelector('.level-down-btn');
+                const menuBtn = dialog.querySelector('.menu-btn');
+                
+                if (nextBtn) {
+                    nextBtn.addEventListener('click', () => {
+                        document.body.removeChild(dialog);
+                        this.nextLevel();
+                    });
+                }
+                
+                if (retryBtn) {
+                    retryBtn.addEventListener('click', () => {
+                        document.body.removeChild(dialog);
+                        this.retryLevel();
+                    });
+                }
+                
+                if (levelDownBtn) {
+                    levelDownBtn.addEventListener('click', () => {
+                        document.body.removeChild(dialog);
+                        this.previousLevel();
+                    });
+                }
+                
+                if (menuBtn) {
+                    menuBtn.addEventListener('click', () => {
+                        document.body.removeChild(dialog);
+                        this.resetGame();
+                    });
+                }
+            }
+            
+            getPlatformMultiplierDisplay() {
+                const multipliers = {
+                    mobile: '×1.3 (+30% por dificultad extra)',
+                    tablet: '×1.1 (+10% capacidades intermedias)',
+                    desktop: '×1.0 (capacidades completas)'
+                };
+                return multipliers[this.platform.type];
+            }
+            
+            getErgonomicRecommendation() {
+                const sessionMinutes = Math.floor(this.sessionDuration / 60000);
+                
+                if (sessionMinutes >= this.platformConfig.restFrequency) {
+                    return `
+                        <div class="ergonomic-reminder">
+                            <h4>⚠️ Recomendación Ergonómica</h4>
+                            <p>Has estado entrenando ${sessionMinutes} minutos en ${this.platform.category}.</p>
+                            <p>${this.getBreakRecommendation()}</p>
+                        </div>
+                    `;
+                }
+                return '';
+            }
+            
+            getSpeedName(speed) {
+                const names = {
+                    'slow': 'Lento',
+                    'medium': 'Medio', 
+                    'fast': 'Rápido',
+                    'extreme': 'Extremo'
+                };
+                return names[speed] || speed;
+            }
+            
+            getSpeedMultiplierDisplay(speed) {
+                const multipliers = {
+                    'slow': '×0.7 (-30%)',
+                    'medium': '×1.0 (base)',
+                    'fast': '×1.4 (+40%)',
+                    'extreme': '×1.8 (+80%)'
+                };
+                return multipliers[speed] || '×1.0';
+            }
+            
+            getNextLevelInfo() {
+                const nextLevel = this.level + 1;
+                let changes = [];
+                
+                // Verificar si se pueden aumentar los parámetros sin exceder límites de plataforma
+                if (nextLevel % 3 === 0 && this.config.primaryTargets < this.platformConfig.maxTargets) {
+                    changes.push(`📈 Objetivos principales: ${this.config.primaryTargets} → ${this.config.primaryTargets + 1}`);
+                }
+                
+                if (nextLevel % 2 === 0 && this.config.distractors < this.platformConfig.maxDistractors) {
+                    changes.push(`📈 Distractores: ${this.config.distractors} → ${this.config.distractors + 2}`);
+                }
+                
+                if (changes.length === 0) {
+                    changes.push(`🎯 Configuración óptima para ${this.platform.category} mantenida`);
+                    changes.push(`🔥 Multiplicador: ${this.calculateDifficultyMultiplier().toFixed(1)}x → ${(this.calculateDifficultyMultiplier() + 0.1).toFixed(1)}x`);
+                }
+                
+                return `
+                    <h4>🚀 ¡Siguiente Nivel ${nextLevel}!</h4>
+                    <p><strong>Optimización ${this.platform.category}:</strong></p>
+                    <ul>
+                        ${changes.map(change => `<li>${change}</li>`).join('')}
+                    </ul>
+                    <p>💡 <em>Configuración científicamente optimizada para tu dispositivo</em></p>
+                `;
+            }
+            
+            getRetryInfo() {
+                const accuracy = this.totalClicks > 0 ? (this.correctClicks / this.totalClicks) * 100 : 0;
+                
+                let tips = [];
+                
+                if (accuracy < 70) {
+                    tips.push(`🎯 Enfócate en precisión: usa ${this.platform.type === 'mobile' ? 'indicadores periféricos' : 'visión periférica'}`);
+                }
+                
+                if (this.missedTargets > 2) {
+                    tips.push(`👁️ Aprovecha tu campo visual de ${this.platform.visualField}`);
+                }
+                
+                if (this.platform.type === 'mobile') {
+                    tips.push("📱 Usa las flechas periféricas para localizar objetivos fuera del centro");
+                }
+                
+                if (tips.length === 0) {
+                    tips.push("💪 ¡Estuviste muy cerca! Solo necesitas un pequeño ajuste");
+                }
+                
+                return `
+                    <h4>🔄 Consejos optimizados para ${this.platform.category}:</h4>
+                    <ul>
+                        ${tips.map(tip => `<li>${tip}</li>`).join('')}
+                    </ul>
+                    <p>📊 <strong>Criterio éxito:</strong> Máximo 1 objetivo perdido (${this.missedTargets}/1)</p>
+                `;
+            }
+            
+            addDialogStyles() {
+                if (!document.getElementById('dialog-styles')) {
+                    const style = document.createElement('style');
+                    style.id = 'dialog-styles';
+                    style.textContent = `
+                        .game-over-dialog {
+                            position: fixed;
+                            top: 0;
+                            left: 0;
+                            width: 100vw;
+                            height: 100vh;
+                            background: rgba(0, 0, 0, 0.9);
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            z-index: 10000;
+                            overflow-y: auto;
+                            padding: 20px;
+                        }
+                        .dialog-content {
+                            background: linear-gradient(135deg, #0c1445 0%, #1a237e 100%);
+                            border: 3px solid #00e676;
+                            border-radius: 15px;
+                            padding: 25px;
+                            max-width: 600px;
+                            width: 100%;
+                            max-height: 90vh;
+                            overflow-y: auto;
+                            text-align: left;
+                            color: white;
+                            box-shadow: 0 0 30px rgba(0, 230, 118, 0.5);
+                        }
+                        .dialog-content h2 {
+                            color: #00e676;
+                            margin-bottom: 20px;
+                            font-size: 1.8rem;
+                            text-align: center;
+                        }
+                        .dialog-content h3 {
+                            color: #00e676;
+                            margin: 15px 0 10px 0;
+                            font-size: 1.2rem;
+                            border-bottom: 1px solid #00e676;
+                            padding-bottom: 5px;
+                        }
+                        .dialog-section {
+                            margin: 20px 0;
+                        }
+                        .platform-summary {
+                            display: grid;
+                            grid-template-columns: 1fr 1fr;
+                            gap: 8px;
+                            margin: 10px 0;
+                        }
+                        .results-grid {
+                            display: grid;
+                            grid-template-columns: 1fr 1fr;
+                            gap: 8px;
+                            margin: 10px 0;
+                        }
+                        .level-score-highlight {
+                            background: linear-gradient(135deg, rgba(0, 230, 118, 0.2), rgba(76, 175, 80, 0.2));
+                            border: 2px solid #00e676;
+                            border-radius: 10px;
+                            padding: 15px;
+                            margin: 10px 0;
+                        }
+                        .score-breakdown {
+                            display: flex;
+                            flex-direction: column;
+                            gap: 8px;
+                        }
+                        .score-before {
+                            color: #bbb;
+                            font-size: 0.9rem;
+                        }
+                        .score-earned {
+                            color: #4caf50;
+                            font-size: 1.1rem;
+                            font-weight: bold;
+                        }
+                        .score-total {
+                            color: #00e676;
+                            font-size: 1.3rem;
+                            font-weight: bold;
+                            border-top: 1px solid #00e676;
+                            padding-top: 8px;
+                        }
+                        .multiplier-breakdown {
+                            background: rgba(0, 230, 118, 0.1);
+                            padding: 10px;
+                            border-radius: 5px;
+                            margin: 5px 0;
+                        }
+                        .ergonomic-reminder {
+                            background: rgba(255, 152, 0, 0.2);
+                            border: 2px solid #ff9800;
+                            border-radius: 8px;
+                            padding: 15px;
+                            margin: 15px 0;
+                        }
+                        .ergonomic-reminder h4 {
+                            color: #ff9800;
+                            margin-bottom: 8px;
+                        }
+                        .dialog-buttons {
+                            display: flex;
+                            gap: 10px;
+                            margin: 25px 0 15px 0;
+                            justify-content: center;
+                            flex-wrap: wrap;
+                        }
+                        .dialog-btn {
+                            padding: 10px 15px;
+                            border: 2px solid #00e676;
+                            border-radius: 8px;
+                            background: linear-gradient(45deg, #00e676, #00c853);
+                            color: #0c1445;
+                            font-weight: bold;
+                            cursor: pointer;
+                            transition: all 0.3s ease;
+                            font-size: 0.9rem;
+                            min-width: 100px;
+                        }
+                        .dialog-btn:hover {
+                            transform: translateY(-2px);
+                            box-shadow: 0 5px 15px rgba(0, 230, 118, 0.4);
+                        }
+                        .next-btn {
+                            background: linear-gradient(45deg, #4caf50, #2e7d32);
+                        }
+                        .retry-btn {
+                            background: linear-gradient(45deg, #ff9800, #f57c00);
+                        }
+                        .level-down-btn {
+                            background: linear-gradient(45deg, #2196f3, #1976d2);
+                        }
+                        .menu-btn {
+                            background: linear-gradient(45deg, #9e9e9e, #616161);
+                        }
+                        .next-level-info {
+                            background: rgba(0, 230, 118, 0.1);
+                            padding: 15px;
+                            border-radius: 8px;
+                            border: 1px solid #00e676;
+                            font-size: 0.9rem;
+                            line-height: 1.4;
+                        }
+                        @media (max-width: 768px) {
+                            .platform-summary, .results-grid {
+                                grid-template-columns: 1fr;
+                            }
+                            .dialog-btn {
+                                min-width: 80px;
+                                font-size: 0.8rem;
+                                padding: 8px 12px;
+                            }
+                        }
+                    `;
+                    document.head.appendChild(style);
+                }
+            }
+            
+            nextLevel() {
+                this.level++;
+                this.increaseDifficulty();
+                setTimeout(() => {
+                    this.startGame();
+                }, 500);
+            }
+            
+            retryLevel() {
+                this.score = this.levelStartScore;
+                setTimeout(() => {
+                    this.startGame();
+                }, 500);
+            }
+            
+            previousLevel() {
+                if (this.level > 1) {
+                    this.level--;
+                    this.decreaseDifficulty();
+                    setTimeout(() => {
+                        this.startGame();
+                    }, 500);
+                }
+            }
+            
+            increaseDifficulty() {
+                // Aumentar gradualmente respetando límites de plataforma
+                if (this.level % 3 === 0 && this.config.primaryTargets < this.platformConfig.maxTargets) {
+                    this.config.primaryTargets = Math.min(this.platformConfig.maxTargets, this.config.primaryTargets + 1);
+                }
+                
+                if (this.level % 2 === 0 && this.config.distractors < this.platformConfig.maxDistractors) {
+                    this.config.distractors = Math.min(this.platformConfig.maxDistractors, this.config.distractors + 2);
+                }
+                
+                // Actualizar velocidad según el nivel y capacidades de plataforma
+                if (this.level >= 5 && this.config.speed === 'slow') this.config.speed = 'medium';
+                if (this.level >= 8 && this.config.speed === 'medium') this.config.speed = 'fast';
+                if (this.level >= 12 && this.config.speed === 'fast' && this.platform.type !== 'mobile') {
+                    this.config.speed = 'extreme';
+                }
+                
+                document.getElementById('speed').value = this.config.speed;
+                this.updateControlValues();
+            }
+            
+            decreaseDifficulty() {
+                // Reducir gradualmente (opuesto a increaseDifficulty)
+                if ((this.level + 1) % 3 === 0 && this.config.primaryTargets > 1) {
+                    this.config.primaryTargets = Math.max(1, this.config.primaryTargets - 1);
+                }
+                
+                if ((this.level + 1) % 2 === 0 && this.config.distractors > 2) {
+                    this.config.distractors = Math.max(2, this.config.distractors - 2);
+                }
+                
+                // Reducir velocidad según el nivel
+                if (this.level < 12 && this.config.speed === 'extreme') this.config.speed = 'fast';
+                if (this.level < 8 && this.config.speed === 'fast') this.config.speed = 'medium';
+                if (this.level < 5 && this.config.speed === 'medium') this.config.speed = 'slow';
+                
+                document.getElementById('speed').value = this.config.speed;
+                this.updateControlValues();
+            }
+            
+            togglePause() {
+                this.isPaused = !this.isPaused;
+                
+                const pauseBtn = document.getElementById('pauseBtn');
+                const mobilePauseBtn = document.getElementById('mobilePauseBtn');
+                
+                if (this.isPaused) {
+                    pauseBtn.textContent = '▶️ Reanudar';
+                    mobilePauseBtn.textContent = '▶️ Reanudar';
+                    this.updatePhaseIndicator('PAUSADO');
+                } else {
+                    pauseBtn.textContent = '⏸️ Pausar';
+                    mobilePauseBtn.textContent = '⏸️ Pausar';
+                    if (this.phase === 'tracking') {
+                        this.updatePhaseIndicator('Sigue los objetivos con tu vista');
+                    }
+                }
+            }
+            
+            pauseGame() {
+                if (!this.isPaused) {
+                    this.togglePause();
+                }
+            }
+            
+            resumeGame() {
+                if (this.isPaused) {
+                    this.togglePause();
+                }
+            }
+            
+            toggleFullscreen() {
+                this.isFullscreen = !this.isFullscreen;
+                const fullscreenBtn = document.getElementById('fullscreenBtn');
+                
+                if (this.isFullscreen) {
+                    this.gameContainer.classList.add('fullscreen');
+                    fullscreenBtn.textContent = '⊡';
+                    fullscreenBtn.title = 'Salir de pantalla completa';
+                    document.body.style.overflow = 'hidden';
+                    
+                    if (this.gameContainer.requestFullscreen) {
+                        this.gameContainer.requestFullscreen().catch(() => {});
+                    }
+                } else {
+                    this.gameContainer.classList.remove('fullscreen');
+                    fullscreenBtn.textContent = '⛶';
+                    fullscreenBtn.title = 'Pantalla completa';
+                    document.body.style.overflow = 'auto';
+                    
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen().catch(() => {});
+                    }
+                }
+                
+                if (this.phase === 'tracking') {
+                    setTimeout(() => {
+                        this.repositionTargetsForNewSize();
+                    }, 300);
+                }
+            }
+            
+            repositionTargetsForNewSize() {
+                const containerRect = this.gameContainer.getBoundingClientRect();
+                const containerWidth = containerRect.width - 40;
+                const containerHeight = containerRect.height - 40;
+                
+                this.targets.forEach(target => {
+                    const currentX = parseFloat(target.style.left);
+                    const currentY = parseFloat(target.style.top);
+                    
+                    const newX = Math.min(currentX, containerWidth);
+                    const newY = Math.min(currentY, containerHeight);
+                    
+                    target.style.left = newX + 'px';
+                    target.style.top = newY + 'px';
+                });
+            }
+            
+            resetGame() {
+                this.phase = 'ready';
+                this.score = 0;
+                this.correctClicks = 0;
+                this.totalClicks = 0;
+                this.missedTargets = 0;
+                this.level = 1;
+                this.isPaused = false;
+                
+                // Resetear configuración a valores optimizados por plataforma
+                this.config = {
+                    primaryTargets: Math.min(3, this.platformConfig.maxTargets),
+                    distractors: Math.min(5, this.platformConfig.maxDistractors),
+                    duration: Math.min(30, this.platformConfig.sessionDuration),
+                    speed: 'medium'
+                };
+                
+                this.levelScore = 0;
+                this.levelStartScore = 0;
+                
+                clearInterval(this.gameTimer);
+                clearTimeout(this.identificationTimer);
+                cancelAnimationFrame(this.animationFrame);
+                
+                this.clearTargets();
+                this.clearPeripheralIndicators();
+                this.updatePhaseIndicator('Listo para comenzar - Optimizado para ' + this.platform.category);
+                this.updateButtons(true, false, true);
+                this.updateStats();
+                this.updateControlValues();
+                
+                document.getElementById('speed').value = this.config.speed;
+                
+                if (this.isFullscreen) {
+                    this.toggleFullscreen();
+                }
+                
+                // Resetear timer de sesión
+                this.sessionStartTime = Date.now();
+                this.sessionDuration = 0;
+            }
+            
+            clearTargets() {
+                this.targets.forEach(target => {
+                    if (target.parentNode) {
+                        target.parentNode.removeChild(target);
+                    }
+                });
+                this.targets = [];
+                this.primaryTargets = [];
+            }
+            
+            updatePhaseIndicator(text) {
+                document.getElementById('phaseIndicator').textContent = text;
+            }
+            
+            updateButtons(start, pause, reset) {
+                document.getElementById('startBtn').disabled = !start;
+                document.getElementById('pauseBtn').disabled = !pause;
+                document.getElementById('resetBtn').disabled = !reset;
+                
+                // Update mobile controls
+                document.getElementById('mobileStartBtn').disabled = !start;
+                document.getElementById('mobilePauseBtn').disabled = !pause;
+                document.getElementById('mobileResetBtn').disabled = !reset;
+            }
+            
+            updateControlValues() {
+                document.getElementById('primaryValue').textContent = this.config.primaryTargets;
+                document.getElementById('distractorValue').textContent = this.config.distractors;
+                document.getElementById('durationValue').textContent = this.config.duration;
+            }
+            
+            updateStats() {
+                const scoreEl = document.getElementById('scoreValue');
+                const accuracyEl = document.getElementById('accuracyValue');
+                const missedEl = document.getElementById('missedValue');
+                const timeEl = document.getElementById('timeValue');
+                const levelEl = document.getElementById('levelValue');
+                const fovEl = document.getElementById('fieldOfViewValue');
+                
+                if (scoreEl) scoreEl.textContent = this.score;
+                if (accuracyEl) accuracyEl.textContent = 
+                    this.totalClicks > 0 ? Math.round((this.correctClicks / this.totalClicks) * 100) + '%' : '0%';
+                if (missedEl) missedEl.textContent = this.missedTargets;
+                if (timeEl) timeEl.textContent = this.timeRemaining + 's';
+                if (levelEl) levelEl.textContent = this.level;
+                if (fovEl) fovEl.textContent = `${this.visualCapabilities.horizontalFOV}°×${this.visualCapabilities.verticalFOV}°`;
+            }
+            
+            showMaxSessionWarning() {
+                if (this.sessionDuration >= this.platformConfig.maxSessionTime) {
+                    const warning = document.createElement('div');
+                    warning.className = 'break-reminder';
+                    warning.innerHTML = `
+                        <h3>⚠️ Tiempo Máximo de Sesión Alcanzado</h3>
+                        <p>Has alcanzado el tiempo máximo recomendado para ${this.platform.category}.</p>
+                        <p><strong>Recomendación:</strong> Toma un descanso prolongado de al menos ${Math.floor(this.platformConfig.recommendedBreakTime / 60000)} minutos.</p>
+                        <p>El entrenamiento visual prolongado puede causar fatiga y reducir la efectividad.</p>
+                        <button onclick="this.parentElement.remove(); game.resetGame()">Finalizar Sesión</button>
+                        <button onclick="this.parentElement.remove()">Continuar (bajo tu responsabilidad)</button>
+                    `;
+                    
+                    document.body.appendChild(warning);
+                }
+            }
+        }
+        
+        // Inicializar el juego optimizado cuando se carga la página
+        document.addEventListener('DOMContentLoaded', () => {
+            window.game = new OptimizedPilotTrainingGame();
+        });
+        
+        // Detectar cambios de orientación en móviles
+        window.addEventListener('orientationchange', () => {
+            setTimeout(() => {
+                if (window.game) {
+                    window.game.recalculateOptimizations();
+                }
+            }, 500);
+        });
+        
+        // Funciones globales para acceso desde elementos dinámicos
+        window.takeBreak = function() {
+            if (window.game) {
+                window.game.takeBreak();
+            }
+        };
+    </script>
+</body>
+</html>
